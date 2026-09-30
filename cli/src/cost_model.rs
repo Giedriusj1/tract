@@ -423,6 +423,8 @@ fn auto_platform() -> Option<Platform> {
             "apple_m3"
         } else if brand.contains("M4") {
             "apple_m4"
+        } else if brand.contains("M5") {
+            "apple_m5"
         } else {
             return None;
         };

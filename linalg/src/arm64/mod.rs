@@ -5,6 +5,8 @@ mod apple_amx;
 mod apple_m1_linear;
 #[cfg(target_os = "macos")]
 mod apple_m4_linear;
+#[cfg(target_os = "macos")]
+mod apple_m5_linear;
 mod arm64simd;
 mod cortex_a53_linear;
 mod cortex_a53_mmv_linear;
@@ -133,7 +135,7 @@ fn apple_get_syscall(key: &str) -> String {
 #[cfg(target_os = "macos")]
 fn apple_chip() -> Option<&'static str> {
     let brand = apple_get_syscall("machdep.cpu.brand_string");
-    [("M1", "m1"), ("M2", "m2"), ("M3", "m3"), ("M4", "m4")]
+    [("M1", "m1"), ("M2", "m2"), ("M3", "m3"), ("M4", "m4"), ("M5", "m5")]
         .into_iter()
         .find_map(|(needle, id)| brand.contains(needle).then_some(id))
 }
@@ -470,6 +472,7 @@ fn apple_chip_preferred(
     let model = match apple_chip()? {
         "m1" => apple_m1_linear::linear_model(),
         "m4" => apple_m4_linear::linear_model(),
+        "m5" => apple_m5_linear::linear_model(),
         _ => return None,
     };
     model.preferred(suitable, query.m, query.k, query.n)
@@ -481,7 +484,7 @@ inventory::submit! {
         arch: Some(crate::isa::Arch::Aarch64),
         precedence: 8,
         name: "apple-chip-model",
-        applies: |_| matches!(apple_chip(), Some("m1") | Some("m4")),
+        applies: |_| matches!(apple_chip(), Some("m1") | Some("m4") | Some("m5")),
         preferred: apple_chip_preferred,
     }
 }
